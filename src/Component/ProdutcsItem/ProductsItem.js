@@ -21,7 +21,7 @@ class ProductsItem extends Component {
           </span>
         </td>
         <td>
-          <button type="button" class="btn btn-info">Edit</button>
+          <button type="button" class="btn btn-info mr-10">Edit</button>
           <button type="button" class="btn btn-danger">Delete</button>
         </td>
       </tr>
