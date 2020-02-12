@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ProductsItem from '../ProdutcsItem/ProductsItem';
 
 class ProductsList extends Component {
     constructor(props) {
@@ -26,7 +25,7 @@ class ProductsList extends Component {
                 </thead>
                 <tbody>
                     {/* Products item */}
-                  <ProductsItem />
+                    {this.props.children}
                 </tbody>
               </table>
             </div>
