@@ -1,6 +1,11 @@
 import React, {Component} from 'react';
 
 class ProductsItem extends Component {
+  onDelete = id => {
+    if (confirm('Are you sure delete ?')) {//eslint-disable-line
+      this.props.onDelete(id);
+    }
+  }
   render() {
     var {product, index} = this.props;
     var statusName = product.status
@@ -21,8 +26,11 @@ class ProductsItem extends Component {
           </span>
         </td>
         <td>
-          <button type="button" class="btn btn-info mr-10">Edit</button>
-          <button type="button" class="btn btn-danger">Delete</button>
+          <button type="button" className="btn btn-info mr-10">Edit</button>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => this.onDelete(product.id)}>Delete</button>
         </td>
       </tr>
     );
