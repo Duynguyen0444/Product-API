@@ -4,6 +4,7 @@ import ProductsItem from '../../Component/ProdutcsItem/ProductsItem';
 import {connect} from 'react-redux';
 import callAPI from '../../utils/apiCaller';
 import {Link} from 'react-router-dom';
+import {actFetchProductsRequest} from '../../Actions/index';
 
 class ProductsListPage extends Component {
   constructor(props) {
@@ -15,18 +16,19 @@ class ProductsListPage extends Component {
   //Component render => componentDidMount(setState) => render
   componentDidMount() {
     callAPI('products', 'GET', null).then(res => {
-      this.setState({products: res.data});
+      // this.setState({products: res.data});
+      this.props.fetchAllProduct();
     });
   }
   // ---------------------FUNCTION---------------------
-  findIndex = (products, id) =>{
+  findIndex = (products, id) => {
     var result = -1;
-    products.forEach((product, index) =>{
-      if(product.id === id){
+    products.forEach((product, index) => {
+      if (product.id === id) {
         result = index;
       }
-    });    
-    return result;    
+    });
+    return result;
   }
 
   showProducts = products => {
@@ -46,20 +48,19 @@ class ProductsListPage extends Component {
   onDelete = id => {
     var {products} = this.state;
     callAPI(`products/${id}`, 'DELETE', null).then(res => {
-      if(res.status === 200){
+      if (res.status === 200) {
         var index = this.findIndex(products, id);
-        if(index !== -1){
+        if (index !== -1) {
           products.splice(index, 1);
-          this.setState({
-            products: products
-          });
+          this.setState({products: products});
         }
       }
     })
-  }  
+  }
   // ---------------------END FUNCTION---------------------
   render() {
-    var {products} = this.state;
+    //Lất state từ store
+    var {products} = this.props;
     return (
       <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <Link to="/products/add" className="btn btn-default mb-10">
@@ -76,4 +77,13 @@ const mapStateToProps = state => {
   return {products: state.products}
 }
 
-export default connect(mapStateToProps, null)(ProductsListPage);
+//Dispatch action to props
+const mapDispatchToProp = (dispatch, props) => {
+  return {
+    fetchAllProduct: () => {
+      dispatch(actFetchProductsRequest());
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProp)(ProductsListPage);

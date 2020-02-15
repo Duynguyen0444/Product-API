@@ -12,6 +12,21 @@ class ProductsActionPage extends Component {
       chkStatus: ''
     }
   }
+  componentDidMount() {
+    var {match} = this.props;
+    if (match) {
+      var id = match.params.id;
+      callAPI(`products/${id}`, 'GET', null).then(res => {
+        var data = res.data;
+        this.setState({
+          id: data.id, 
+          txtName: data.name, 
+          txtPrice: data.price, 
+          chkStatus: data.status
+        });
+      });
+    }
+  }
 
   onChange = (event) => {
     var target = event.target;
@@ -22,17 +37,27 @@ class ProductsActionPage extends Component {
     this.setState({[name]: value})
   }
 
-  onSave = event =>{
+  onSave = event => {
     event.preventDefault();
-    var {txtName, txtPrice, chkStatus} = this.state;
+    var {txtName, txtPrice, chkStatus, id} = this.state;
     var {history} = this.props;
-    callAPI('products', 'POST', {
-      name: txtName,
-      price: txtPrice,
-      status: chkStatus
-    }).then(res =>{
-      history.goBack();
-    });
+    if (id) {  //-----Update
+      callAPI(`products/${id}`, 'PUT', {
+        name: txtName,
+        price: txtPrice,
+        status: chkStatus              
+      }).then(res =>{
+        history.goBack();
+      });
+    } else {  //-----Post
+      callAPI('products', 'POST', {
+        name: txtName,
+        price: txtPrice,
+        status: chkStatus    
+      }).then(res => {
+        history.goBack();
+      });
+    }
   }
 
   render() {
@@ -70,10 +95,11 @@ class ProductsActionPage extends Component {
                 type="checkbox"
                 name="chkStatus"
                 value={chkStatus}
-                onChange={this.onChange}/>
+                onChange={this.onChange}
+                checked={chkStatus}/>
               Còn hàng
             </label>
-          </div>          
+          </div>
           <button type="submit" className="btn btn-primary mr-10">Save</button>
           <Link to='/products-list' className="btn btn-danger">Back</Link>
         </form>
