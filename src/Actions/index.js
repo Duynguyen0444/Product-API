@@ -14,7 +14,6 @@ export const actFetchProducts = products => {
   return {type: types.FETCH_PRODUCTS, products}
 }
 
-
 //-----------------------------Action Delete-----------------------------
 export const actDeleteProductsRequest = id => {
   return (dispatch) => {
@@ -26,4 +25,17 @@ export const actDeleteProductsRequest = id => {
 
 export const actDeleteProducts = id => {
   return {type: types.DELETE_PRODUCTS, id}
+}
+
+//-----------------------------Action Add-----------------------------
+export const actAddProductsRequest = products => {
+  return dispatch => {
+    return callAPI('products', 'POST', products).then(res => {
+      dispatch(actAddProducts(res.data)); //Product trên server trả về
+    });
+  }
+}
+
+export const actAddProducts = products => {
+  return {type: types.ADD_PRODUCTS, products}
 }

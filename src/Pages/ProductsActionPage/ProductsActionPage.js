@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import callAPI from '../../utils/apiCaller';
 import {Link} from 'react-router-dom';
+import {actAddProductsRequest} from '../../Actions/index';
+import {connect} from 'react-redux';
 
 class ProductsActionPage extends Component {
   constructor(props) {
@@ -18,12 +20,7 @@ class ProductsActionPage extends Component {
       var id = match.params.id;
       callAPI(`products/${id}`, 'GET', null).then(res => {
         var data = res.data;
-        this.setState({
-          id: data.id, 
-          txtName: data.name, 
-          txtPrice: data.price, 
-          chkStatus: data.status
-        });
+        this.setState({id: data.id, txtName: data.name, txtPrice: data.price, chkStatus: data.status});
       });
     }
   }
@@ -41,22 +38,30 @@ class ProductsActionPage extends Component {
     event.preventDefault();
     var {txtName, txtPrice, chkStatus, id} = this.state;
     var {history} = this.props;
-    if (id) {  //-----Update
+    var products = {
+      id: id,
+      name: txtName,
+      price: txtPrice,
+      status: chkStatus
+    }
+    if (id) { //-----Update
       callAPI(`products/${id}`, 'PUT', {
         name: txtName,
         price: txtPrice,
-        status: chkStatus              
-      }).then(res =>{
-        history.goBack();
-      });
-    } else {  //-----Post
-      callAPI('products', 'POST', {
-        name: txtName,
-        price: txtPrice,
-        status: chkStatus    
+        status: chkStatus
       }).then(res => {
         history.goBack();
       });
+    } else { //-----Post
+      this.props.onAddProducts(products);
+      history.goBack();
+      // callAPI('products', 'POST', {
+      //   name: txtName,
+      //   price: txtPrice,
+      //   status: chkStatus
+      // }).then(res => {
+      //   history.goBack();
+      // });
     }
   }
 
@@ -109,4 +114,12 @@ class ProductsActionPage extends Component {
   }
 }
 
-export default ProductsActionPage;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onAddProducts: products => {
+      dispatch(actAddProductsRequest(products));
+    }
+  }
+}
+
+export default connect(null, mapDispatchToProps)(ProductsActionPage);
