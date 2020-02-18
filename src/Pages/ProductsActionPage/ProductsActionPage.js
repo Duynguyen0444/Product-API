@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import callAPI from '../../utils/apiCaller';
 import {Link} from 'react-router-dom';
-import {actAddProductsRequest} from '../../Actions/index';
+import {actAddProductsRequest, actGetProductRequest, actUpdateProductsRequest} from '../../Actions/index';
 import {connect} from 'react-redux';
 
 class ProductsActionPage extends Component {
@@ -17,11 +16,25 @@ class ProductsActionPage extends Component {
   componentDidMount() {
     var {match} = this.props;
     if (match) {
+      //Lấy tham số trên url
       var id = match.params.id;
-      callAPI(`products/${id}`, 'GET', null).then(res => {
-        var data = res.data;
-        this.setState({id: data.id, txtName: data.name, txtPrice: data.price, chkStatus: data.status});
-      });
+      this.props.onEditProduct(id);
+      // callAPI(`products/${id}`, 'GET', null).then(res => {
+      //   var data = res.data;
+      //   this.setState({id: data.id, txtName: data.name, txtPrice: data.price, chkStatus: data.status});
+      // });
+    }
+  }
+  //Khi nhận được props mới thực thi component này
+  componentWillReceiveProps(nextProps){
+    if(nextProps && nextProps.itemEditing){
+      var {itemEditing} = nextProps;
+      this.setState({
+        id: itemEditing.id,
+        txtName: itemEditing.name,
+        txtPrice: itemEditing.price,
+        chkStatus: itemEditing.status
+      })
     }
   }
 
@@ -45,16 +58,16 @@ class ProductsActionPage extends Component {
       status: chkStatus
     }
     if (id) { //-----Update
-      callAPI(`products/${id}`, 'PUT', {
-        name: txtName,
-        price: txtPrice,
-        status: chkStatus
-      }).then(res => {
-        history.goBack();
-      });
+      this.props.onUpdateProduct(products);
+      // callAPI(`products/${id}`, 'PUT', {
+      //   name: txtName,
+      //   price: txtPrice,
+      //   status: chkStatus
+      // }).then(res => {
+      //   history.goBack();
+      // });      
     } else { //-----Post
-      this.props.onAddProducts(products);
-      history.goBack();
+      this.props.onAddProducts(products);      
       // callAPI('products', 'POST', {
       //   name: txtName,
       //   price: txtPrice,
@@ -63,6 +76,7 @@ class ProductsActionPage extends Component {
       //   history.goBack();
       // });
     }
+    history.goBack();   
   }
 
   render() {
@@ -114,12 +128,25 @@ class ProductsActionPage extends Component {
   }
 }
 
+
+const mapStateToProps = state =>{
+  return{
+    itemEditing: state.itemEditing
+  }
+}
 const mapDispatchToProps = (dispatch, props) => {
   return {
     onAddProducts: products => {
       dispatch(actAddProductsRequest(products));
+    },
+    onEditProduct: id =>{
+      dispatch(actGetProductRequest(id));
+    }, 
+    onUpdateProduct: products =>{
+      dispatch(actUpdateProductsRequest(products));
     }
   }
 }
 
-export default connect(null, mapDispatchToProps)(ProductsActionPage);
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductsActionPage);
